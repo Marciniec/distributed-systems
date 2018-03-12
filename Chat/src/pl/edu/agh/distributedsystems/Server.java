@@ -19,7 +19,7 @@ public class Server {
         clients = new CopyOnWriteArrayList<>();
     }
 
-    private void broadcastTcpMessage(Socket clientSocket, String clientNick, String message) throws IOException {
+    private synchronized void broadcastTcpMessage(Socket clientSocket, String clientNick, String message) throws IOException {
         for (Socket client :
                 clients) {
             if (!client.equals(clientSocket)) {
@@ -37,7 +37,7 @@ public class Server {
         return receiveBuffer;
     }
 
-    private void broadcastUdpMessage(Socket clientSocket, byte[] sendBuffer) throws IOException {
+    private synchronized void broadcastUdpMessage(Socket clientSocket, byte[] sendBuffer) throws IOException {
         for (Socket client :
                 clients) {
             if (!client.equals(clientSocket)) {
