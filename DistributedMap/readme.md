@@ -3,5 +3,5 @@ DistributedMap is an implementation of distributed hashtable using JGroups.
 
 In order to run just compile and run Main.
 
-Solution for first distribiuted systems lab.
+Solution for group communication distribiuted systems lab.
 
