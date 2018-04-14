@@ -1,5 +1,6 @@
-package pl.edu.agh.ki.sr.map;
+package pl.edu.agh.ki.sr;
 
+import org.jgroups.JChannel;
 
 import java.util.Scanner;
 
@@ -7,9 +8,10 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
+//        System.setProperty("jgroups.bind_addr", "127.0.0.1");
         System.setProperty("java.net.preferIPv4Stack", "true");
         String channelName = "SRCHANNEL";
-        String multicastAdress = "230.0.0.x";
+        String multicastAdress = "230.0.0.4";
         DistributedMap map = new DistributedMap(channelName);
         Scanner scanner = new Scanner(System.in);
         String input;
