@@ -10,8 +10,8 @@ import java.util.concurrent.TimeoutException;
 
 public class Doctor {
     private Channel channel;
-    private static final String EXCHANGE_COMMISSION_NAME = "exchangeExamOrder";
-    private static final String EXCHANGE_RESULT_NAME = "exchangeExamResult";
+    private static final String EXCHANGE_COMMISSION_NAME = "ExamCommissionExchange";
+    private static final String EXCHANGE_RESULT_NAME = "ExamResultExchange";
 
     public Doctor() throws IOException, TimeoutException {
         // connection & channel

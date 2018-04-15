@@ -6,21 +6,18 @@ import pl.edu.agh.ki.sr.injuries.Injury;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 public class Technician {
 
     private static final String EXCHANGE_COMMISSION_NAME = "ExamCommissionExchange";
-    private static final String EXCHANGE_RESULT_NAME = "exchangeExamResult";
+    private static final String EXCHANGE_RESULT_NAME = "ExamResultExchange";
 
     private Injury specialisation1;
     private Injury specialisation2;
     private Connection connection;
-    private Channel channel1;
-    private Channel channel2;
-    private Channel channelPublisher;
+    private Channel receiveChannel;
+    private Channel publishChannel;
 
     private void startTechnician() throws IOException, TimeoutException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -33,11 +30,10 @@ public class Technician {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
             connection = factory.newConnection();
-            channelPublisher = connection.createChannel();
-            channel1 = connection.createChannel();
-            channel2 = connection.createChannel();
-            initChannelForInjury(channel1, specialisation1);
-            initChannelForInjury(channel2, specialisation2);
+            publishChannel = connection.createChannel();
+            receiveChannel = connection.createChannel();
+            initChannelForInjury(receiveChannel, specialisation1);
+            initChannelForInjury(receiveChannel, specialisation2);
 
         } catch (IllegalArgumentException e) {
             System.out.println("Wrong specialisation name");
@@ -60,6 +56,11 @@ public class Technician {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 System.out.println("Received: " + message);
                 channel.basicAck(envelope.getDeliveryTag(), false);
             }
