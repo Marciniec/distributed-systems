@@ -3,6 +3,7 @@ package pl.edu.agh.ki.sr.personel.Doctor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,16 +16,19 @@ public class MedicalExamCommissionPublisher implements Runnable {
     private BufferedReader bufferedReader;
     private static final String EXCHANGE_NAME = "ExamCommissionExchange";
     private String routingKey;
+    private String doctorsName;
 
-    public MedicalExamCommissionPublisher(Channel channel) {
+    public MedicalExamCommissionPublisher(Channel channel, String doctorsName) {
         this.channel = channel;
+        this.doctorsName = doctorsName;
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         routingKey = "";
     }
 
     private List<String> extractOrdersFromMessage(String message) throws IllegalArgumentException {
-        List<String> commands = Arrays.asList(message.split(" "));
+        List<String> commands = new ArrayList<>(Arrays.asList(message.split(" ")));
         Injury.valueOf(commands.get(0));
+        commands.add(doctorsName);
         return commands;
     }
 
@@ -45,7 +49,7 @@ public class MedicalExamCommissionPublisher implements Runnable {
                     commands = extractOrdersFromMessage(message);
                     routingKey = "hospital.tech." + commands.get(0);
                     System.out.println(routingKey);
-                    message = commands.get(1);
+                    message = String.join(" ", commands);
                 } catch (IllegalArgumentException e) {
                     System.out.println("Wrong exam name please write it again");
                     continue;

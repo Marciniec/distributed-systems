@@ -25,16 +25,21 @@ public class Technician {
 
             System.out.println("Write first specialisation: ");
             specialisation1 = Injury.valueOf(bufferedReader.readLine());
+
             System.out.println("Write second specialisation: ");
             specialisation2 = Injury.valueOf(bufferedReader.readLine());
+
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
             connection = factory.newConnection();
+
             publishChannel = connection.createChannel();
+            publishChannel.exchangeDeclare(EXCHANGE_RESULT_NAME, BuiltinExchangeType.TOPIC);
+
             receiveChannel = connection.createChannel();
+
             initChannelForInjury(receiveChannel, specialisation1);
             initChannelForInjury(receiveChannel, specialisation2);
-
         } catch (IllegalArgumentException e) {
             System.out.println("Wrong specialisation name");
         }
@@ -56,12 +61,10 @@ public class Technician {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 System.out.println("Received: " + message);
+
+                String returnMessage = createMessageToReturn(message);
+                publishChannel.basicPublish(EXCHANGE_RESULT_NAME, "hospital.doctor." + extractReceivingDoctorsName(message), null, returnMessage.getBytes("UTF-8"));
                 channel.basicAck(envelope.getDeliveryTag(), false);
             }
         };
@@ -69,6 +72,20 @@ public class Technician {
         // start listening
         System.out.println("Waiting for messages...");
         channel.basicConsume(queueName, false, consumer);
+
+    }
+
+    private String extractReceivingDoctorsName(String message) {
+        return message.split(" ")[2];
+    }
+
+    private String createMessageToReturn(String message) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] extractedMessage = message.split(" ");
+        stringBuilder.append(extractedMessage[1]).append(" ");
+        stringBuilder.append(extractedMessage[0]).append(" ");
+        stringBuilder.append("done");
+        return stringBuilder.toString();
 
     }
 
