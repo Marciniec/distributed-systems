@@ -12,12 +12,14 @@ public class Technician {
 
     private static final String EXCHANGE_COMMISSION_NAME = "ExamCommissionExchange";
     private static final String EXCHANGE_RESULT_NAME = "ExamResultExchange";
+    private final static String EXCHANGE_ADMIN_NAME = "AdminExchange";
 
     private Injury specialisation1;
     private Injury specialisation2;
     private Connection connection;
     private Channel receiveChannel;
     private Channel publishChannel;
+    private Channel adminChannel;
 
     private void startTechnician() throws IOException, TimeoutException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -40,9 +42,29 @@ public class Technician {
 
             initChannelForInjury(receiveChannel, specialisation1);
             initChannelForInjury(receiveChannel, specialisation2);
+            initAdminChannel();
+
         } catch (IllegalArgumentException e) {
             System.out.println("Wrong specialisation name");
         }
+    }
+
+
+    private void initAdminChannel() throws IOException {
+        adminChannel = connection.createChannel();
+        adminChannel.exchangeDeclare(EXCHANGE_ADMIN_NAME, BuiltinExchangeType.FANOUT);
+        String queueName = adminChannel.queueDeclare().getQueue();
+        adminChannel.queueBind(queueName, EXCHANGE_ADMIN_NAME, "");
+        Consumer consumer = new DefaultConsumer(adminChannel) {
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                String message = new String(body, "UTF-8");
+                System.out.println("Received: " + message);
+            }
+        };
+        // start listening
+        adminChannel.basicConsume(queueName, false, consumer);
+
     }
 
     private void initChannelForInjury(Channel channel, Injury injury) throws IOException {
@@ -52,7 +74,6 @@ public class Technician {
         String queueName = injury.name();
         channel.queueDeclare(queueName, false, false, false, null);
         String routingKey = "hospital.tech." + injury.name();
-        System.out.println(routingKey);
         channel.queueBind(queueName, EXCHANGE_COMMISSION_NAME, routingKey);
         System.out.println("created queue: " + queueName);
 
