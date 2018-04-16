@@ -1,4 +1,4 @@
-package pl.edu.agh.ki.sr.personel.Technician;
+package pl.edu.agh.ki.sr.personnel.Technician;
 
 import com.rabbitmq.client.*;
 import pl.edu.agh.ki.sr.injuries.Injury;
@@ -8,28 +8,28 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeoutException;
 
+import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_COMMISSION_NAME;
+import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_RESULT_NAME;
+import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_ADMIN_NAME;
+
 public class Technician {
 
-    private static final String EXCHANGE_COMMISSION_NAME = "ExamCommissionExchange";
-    private static final String EXCHANGE_RESULT_NAME = "ExamResultExchange";
-    private final static String EXCHANGE_ADMIN_NAME = "AdminExchange";
 
-    private Injury specialisation1;
-    private Injury specialisation2;
     private Connection connection;
-    private Channel receiveChannel;
     private Channel publishChannel;
-    private Channel adminChannel;
+
+    private static final String receiveRoutingKeyPart = "hospital.tech.";
+    private static final String publishRoutingKeyPart = "hospital.doctor.";
 
     private void startTechnician() throws IOException, TimeoutException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         try {
 
             System.out.println("Write first specialisation: ");
-            specialisation1 = Injury.valueOf(bufferedReader.readLine());
+            Injury specialisation1 = Injury.valueOf(bufferedReader.readLine());
 
             System.out.println("Write second specialisation: ");
-            specialisation2 = Injury.valueOf(bufferedReader.readLine());
+            Injury specialisation2 = Injury.valueOf(bufferedReader.readLine());
 
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
@@ -38,28 +38,30 @@ public class Technician {
             publishChannel = connection.createChannel();
             publishChannel.exchangeDeclare(EXCHANGE_RESULT_NAME, BuiltinExchangeType.TOPIC);
 
-            receiveChannel = connection.createChannel();
+            Channel receiveChannel = connection.createChannel();
 
             initChannelForInjury(receiveChannel, specialisation1);
             initChannelForInjury(receiveChannel, specialisation2);
             initAdminChannel();
 
         } catch (IllegalArgumentException e) {
-            System.out.println("Wrong specialisation name");
+            System.out.println("Wrong specialisation name!");
         }
     }
 
 
     private void initAdminChannel() throws IOException {
-        adminChannel = connection.createChannel();
+        Channel adminChannel = connection.createChannel();
         adminChannel.exchangeDeclare(EXCHANGE_ADMIN_NAME, BuiltinExchangeType.FANOUT);
+
         String queueName = adminChannel.queueDeclare().getQueue();
         adminChannel.queueBind(queueName, EXCHANGE_ADMIN_NAME, "");
+
         Consumer consumer = new DefaultConsumer(adminChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
-                System.out.println("Received: " + message);
+                System.out.println("\u001B[31m" + "Received from admin: " + message + "\u001B[0m");
             }
         };
         // start listening
@@ -73,7 +75,7 @@ public class Technician {
         // queue & bind
         String queueName = injury.name();
         channel.queueDeclare(queueName, false, false, false, null);
-        String routingKey = "hospital.tech." + injury.name();
+        String routingKey = receiveRoutingKeyPart + injury.name();
         channel.queueBind(queueName, EXCHANGE_COMMISSION_NAME, routingKey);
         System.out.println("created queue: " + queueName);
 
@@ -82,10 +84,10 @@ public class Technician {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
-                System.out.println("Received: " + message);
+                System.out.println("\u001B[34m" + "Received from doctor: " + message + "\u001B[0m");
 
                 String returnMessage = createMessageToReturn(message);
-                publishChannel.basicPublish(EXCHANGE_RESULT_NAME, "hospital.doctor." + extractReceivingDoctorsName(message), null, returnMessage.getBytes("UTF-8"));
+                publishChannel.basicPublish(EXCHANGE_RESULT_NAME, publishRoutingKeyPart + extractReceivingDoctorsName(message), null, returnMessage.getBytes("UTF-8"));
                 channel.basicAck(envelope.getDeliveryTag(), false);
             }
         };

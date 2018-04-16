@@ -1,4 +1,4 @@
-package pl.edu.agh.ki.sr.personel.Admin;
+package pl.edu.agh.ki.sr.personnel.Admin;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;

@@ -1,14 +1,15 @@
-package pl.edu.agh.ki.sr.personel.Admin;
+package pl.edu.agh.ki.sr.personnel.Admin;
 
 import com.rabbitmq.client.*;
 
+import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_COMMISSION_NAME;
+import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_RESULT_NAME;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class MessageReceiver {
 
-    private static final String EXCHANGE_COMMISSION_NAME = "ExamCommissionExchange";
-    private static final String EXCHANGE_RESULT_NAME = "ExamResultExchange";
+
     private static final String commissionQueue = "AdminQueueCommission";
     private static final String resultQueue = "AdminQueueResult";
     private static final String routingKey = "hospital.#.#";

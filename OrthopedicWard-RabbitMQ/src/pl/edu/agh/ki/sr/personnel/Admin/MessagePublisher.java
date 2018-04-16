@@ -1,4 +1,4 @@
-package pl.edu.agh.ki.sr.personel.Admin;
+package pl.edu.agh.ki.sr.personnel.Admin;
 
 
 import com.rabbitmq.client.BuiltinExchangeType;
@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeoutException;
 
+import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_ADMIN_NAME;
+
 public class MessagePublisher implements Runnable {
 
-    private final static String EXCHANGE_ADMIN_NAME = "AdminExchange";
     private Channel channel;
 
     public MessagePublisher() throws IOException, TimeoutException {
