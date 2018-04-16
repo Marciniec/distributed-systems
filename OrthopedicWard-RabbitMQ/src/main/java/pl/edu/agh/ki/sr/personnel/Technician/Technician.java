@@ -69,7 +69,7 @@ public class Technician {
 
     }
 
-    private void initChannelForInjury(Channel channel, Injury injury) throws IOException {
+    private void initChannelForInjury(final Channel channel, Injury injury) throws IOException {
         channel.exchangeDeclare(EXCHANGE_COMMISSION_NAME, BuiltinExchangeType.TOPIC);
 
         // queue & bind

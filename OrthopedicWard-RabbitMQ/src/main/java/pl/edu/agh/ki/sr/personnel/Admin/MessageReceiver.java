@@ -4,8 +4,15 @@ import com.rabbitmq.client.*;
 
 import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_COMMISSION_NAME;
 import static pl.edu.agh.ki.sr.config.Config.EXCHANGE_RESULT_NAME;
+
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+
 
 public class MessageReceiver {
 
@@ -13,6 +20,8 @@ public class MessageReceiver {
     private static final String commissionQueue = "AdminQueueCommission";
     private static final String resultQueue = "AdminQueueResult";
     private static final String routingKey = "hospital.#.#";
+    private static final Logger LOGGER = LogManager.getLogger(MessageReceiver.class);
+
 
     public void startListeningOn() throws IOException, TimeoutException {
         initListening(EXCHANGE_RESULT_NAME, resultQueue);
@@ -35,7 +44,7 @@ public class MessageReceiver {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
-                System.out.println("Received: " + message);
+                LOGGER.log(Level.INFO, "Received " + message);
                 channel.basicAck(envelope.getDeliveryTag(), false);
             }
         };
