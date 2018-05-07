@@ -47,12 +47,12 @@ message CurrencyExchange {
     CurrencyType type = 1;
     double exchangeRate = 2;
 }
-message Currency {
-    CurrencyType type = 1;
+message Currencies {
+    repeated CurrencyType type = 1;
 }
 
 service ExchangeService {
-    rpc getCurrencyRate (stream Currency) returns (stream CurrencyExchange) {
+    rpc getCurrencyRate (Currencies) returns (stream CurrencyExchange) {
     }
 }
 
