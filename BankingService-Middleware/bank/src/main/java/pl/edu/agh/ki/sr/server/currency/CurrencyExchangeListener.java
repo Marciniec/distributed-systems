@@ -2,9 +2,7 @@ package pl.edu.agh.ki.sr.server.currency;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import io.grpc.stub.StreamObserver;
 import pl.edu.agh.ki.sr.Currencies;
 import pl.edu.agh.ki.sr.CurrencyExchange;
 import pl.edu.agh.ki.sr.CurrencyType;
@@ -13,10 +11,10 @@ import pl.edu.agh.ki.sr.ExchangeServiceGrpc;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class CurrencyExchangeListener {
+
     private final ManagedChannel channel;
     private final ExchangeServiceGrpc.ExchangeServiceBlockingStub exchangeServiceBlockingStub;
     private final ExchangeServiceGrpc.ExchangeServiceStub exchangeServiceStub;
