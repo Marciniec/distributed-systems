@@ -9,7 +9,6 @@ import pl.edu.agh.ki.sr.CurrencyType;
 import pl.edu.agh.ki.sr.ExchangeServiceGrpc;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +17,6 @@ public class CurrencyExchangeListener {
 
     private final ManagedChannel channel;
     private final ExchangeServiceGrpc.ExchangeServiceBlockingStub exchangeServiceBlockingStub;
-    private final ExchangeServiceGrpc.ExchangeServiceStub exchangeServiceStub;
     private final Map<CurrencyType, Double> rates;
 
     public CurrencyExchangeListener(String host, int port, Map<CurrencyType, Double> rates) {
@@ -28,7 +26,6 @@ public class CurrencyExchangeListener {
                 .build();
         exchangeServiceBlockingStub = ExchangeServiceGrpc.newBlockingStub(channel);
 
-        exchangeServiceStub = ExchangeServiceGrpc.newStub(channel);
     }
 
     public void shutdown() throws InterruptedException {

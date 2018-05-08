@@ -12,6 +12,15 @@ module Bank
         USD = 3
     };
 
+    exception DateError
+    {
+        string reason;
+    };
+    exception InvalidValueError
+    {
+        string reason;
+    };
+
     class Credit
     {
         CurrencyType foreignCurrency;
@@ -26,23 +35,15 @@ module Bank
          double getBalance();
          void depositMoney(double amount);
     };
-    interface PremiumAccount extends Account throws DateError, InvalidValueError
+    interface PremiumAccount extends Account
     {
-         Credit getCredit(double amount, CurrencyType currency, long startDate, long endDate);
+         Credit getCredit(double amount, CurrencyType currency, long startDate, long endDate) throws DateError, InvalidValueError;
 
     };
     interface AccountFactory
     {
-        Account * createAccount(string firstName, string lastName, string pesel, double monthlyIncome);
+        Account * createAccount(string firstName, string lastName, string pesel, double monthlyIncome)throws InvalidValueError;
     };
-
-    exception DateError{
-        string reason;
-    };
-    exception InvalidValueError{
-        string reason;
-    };
-
 
 };
 
