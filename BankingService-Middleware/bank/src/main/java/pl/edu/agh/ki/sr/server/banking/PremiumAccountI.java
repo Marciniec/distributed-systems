@@ -27,7 +27,7 @@ public class PremiumAccountI extends AccountI implements PremiumAccount {
         double cost;
         double domesticCost;
         double percentage = 1.12;
-        logger.log(Level.INFO, String.format("Client %s %s asked for credit: %f %s", getFirstName(), getLastName(), amount, String.valueOf(currency)));
+        logger.log(Level.INFO, "\u001B[32m" + String.format("Client %s %s asked for credit: %f %s", getFirstName(), getLastName(), amount, String.valueOf(currency)) + "\u001B[0m");
         cost = amount * percentage;
         domesticCost = rates.calculateWorth(rates.fromIceToProtoCurrency(currency), rates.fromIceToProtoCurrency(PLN), cost);
         return new Credit(currency, cost, PLN, domesticCost);

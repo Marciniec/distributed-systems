@@ -26,10 +26,10 @@ public class AccountFactoryI implements AccountFactory {
     public AccountPrx createAccount(String firstName, String lastName, String pesel, double monthlyIncome, Current current) throws InvalidValueError {
         if (monthlyIncome < 0) throw new InvalidValueError("Income should be positive");
         if (monthlyIncome >= premiumIncome) {
-            logger.log(Level.INFO, String.format("Creating PREMIUM account: %s, %s, %s,  %f", firstName, lastName, pesel, monthlyIncome));
+            logger.log(Level.INFO, "\u001B[37m" + String.format("Creating PREMIUM account: %s, %s, %s,  %f", firstName, lastName, pesel, monthlyIncome) + "\u001B[0m");
             return PremiumAccountPrx.uncheckedCast(current.adapter.add(new PremiumAccountI(firstName, lastName, pesel, monthlyIncome, rates), new Identity(pesel, "premium")));
         }
-        logger.log(Level.INFO, String.format("Creating STANDARD account: %s, %s, %s,  %f", firstName, lastName, pesel, monthlyIncome));
+        logger.log(Level.INFO, "\u001B[37m" + String.format("Creating STANDARD account: %s, %s, %s,  %f", firstName, lastName, pesel, monthlyIncome) + "\u001B[0m");
         return AccountPrx.uncheckedCast(current.adapter.add(new AccountI(firstName, lastName, pesel, monthlyIncome), new Identity(pesel, "standard")));
     }
 

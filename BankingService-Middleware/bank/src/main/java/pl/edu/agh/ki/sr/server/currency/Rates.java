@@ -16,7 +16,7 @@ public class Rates {
     }
 
     public double calculateWorth(CurrencyType from, CurrencyType to, double value) {
-        logger.log(Level.INFO, "Calculating " + from + "*" + String.valueOf(value) + "/" + to);
+        logger.log(Level.INFO, "\u001B[36m" + "Calculating " + from + "*" + String.valueOf(value) + "/" + to + "\u001B[0m");
         return (rates.get(from) * value) / rates.get(to);
     }
 
