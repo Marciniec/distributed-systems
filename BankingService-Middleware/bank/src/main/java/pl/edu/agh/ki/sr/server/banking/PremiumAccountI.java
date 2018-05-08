@@ -4,7 +4,7 @@ import Bank.Credit;
 import Bank.CurrencyType;
 import Bank.PremiumAccount;
 import com.zeroc.Ice.Current;
-import pl.edu.agh.ki.sr.server.utils.Rates;
+import pl.edu.agh.ki.sr.server.currency.Rates;
 
 import static Bank.CurrencyType.PLN;
 

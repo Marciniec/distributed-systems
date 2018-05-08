@@ -5,6 +5,7 @@
 apply plugin: 'java'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'idea'
+apply plugin: "com.zeroc.gradle.ice-builder.slice"
 
 
 repositories {
@@ -15,10 +16,13 @@ repositories {
 buildscript {
     repositories {
         mavenCentral()
-
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.4'
+        classpath "gradle.plugin.com.zeroc.gradle.ice-builder:slice:1.4.5"
 
     }
 }
@@ -42,7 +46,11 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
 }
-
+slice {
+    java {
+        files = [file("slice/bank.ice")]
+    }
+}
 protobuf {
     protoc {
         // The artifact spec for the Protobuf Compiler
