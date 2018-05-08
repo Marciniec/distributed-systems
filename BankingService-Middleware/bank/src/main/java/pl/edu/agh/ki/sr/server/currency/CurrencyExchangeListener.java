@@ -11,6 +11,7 @@ import pl.edu.agh.ki.sr.ExchangeServiceGrpc;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class CurrencyExchangeListener {
@@ -18,9 +19,9 @@ public class CurrencyExchangeListener {
     private final ManagedChannel channel;
     private final ExchangeServiceGrpc.ExchangeServiceBlockingStub exchangeServiceBlockingStub;
     private final ExchangeServiceGrpc.ExchangeServiceStub exchangeServiceStub;
-    private final HashMap<CurrencyType, Double> rates;
+    private final Map<CurrencyType, Double> rates;
 
-    public CurrencyExchangeListener(String host, int port, HashMap<CurrencyType, Double> rates) {
+    public CurrencyExchangeListener(String host, int port, Map<CurrencyType, Double> rates) {
         this.rates = rates;
         channel = ManagedChannelBuilder.forAddress(host, port)
                 .usePlaintext(true)
