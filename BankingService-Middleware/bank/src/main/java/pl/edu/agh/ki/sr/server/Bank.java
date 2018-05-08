@@ -15,8 +15,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Bank {
+
+    private static final Logger logger = Logger.getLogger(Bank.class.getName());
+
     private int bankPort;
     private String bankName;
     private CurrencyType[] handledCurrencies;
@@ -53,7 +58,7 @@ public class Bank {
             // 5. Aktywacja adaptera i przejcie w pêtlê przetwarzania ¿¹dañ
             adapter.activate();
 
-            System.out.println("Entering event processing loop...");
+            logger.log(Level.INFO, "Entering event processing loop...");
             listener.startListeningOnCurrencyExchange(handledCurrencies);
 
             communicator.waitForShutdown();

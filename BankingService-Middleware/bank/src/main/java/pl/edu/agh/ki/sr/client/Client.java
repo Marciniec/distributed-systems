@@ -22,7 +22,11 @@ public class Client {
 
             System.out.println("ENTER BANK NAME");
             String bankName = in.readLine();
+            System.out.print("==> ");
+            System.out.flush();
             System.out.println("ENTER PORT NUMBER");
+            System.out.print("==> ");
+            System.out.flush();
             String portStr = in.readLine();
             int port = Integer.valueOf(portStr);
 
@@ -46,19 +50,35 @@ public class Client {
 
             System.out.print("==> ");
             System.out.flush();
+            System.out.println("CREATE ACCOUNT OR LOG IN");
             line = in.readLine();
             AccountPrx account = null;
             if (line.equals("create")) {
                 System.out.println("FIRST NAME");
+                System.out.print("==> ");
+                System.out.flush();
                 String firstName = in.readLine();
                 System.out.println("LAST NAME");
+                System.out.print("==> ");
+                System.out.flush();
                 String lastName = in.readLine();
                 System.out.println("PESEL");
+                System.out.print("==> ");
+                System.out.flush();
                 String pesel = in.readLine();
                 System.out.println("YOUR MONTHLY INCOME");
+                System.out.print("==> ");
+                System.out.flush();
+
                 String income = in.readLine();
                 double money = Double.valueOf(income);
-                account = obj.createAccount(firstName, lastName, pesel, money);
+                try {
+                    account = obj.createAccount(firstName, lastName, pesel, money);
+
+                } catch (InvalidValueError e) {
+                    System.out.println(e.reason);
+                    System.exit(1);
+                }
                 System.out.println("Created account");
             }
             if (line.equals("premium") || line.equals("standard")) {
@@ -111,10 +131,15 @@ public class Client {
                         String endDate = in.readLine();
                         d = f.parse(endDate);
                         long endMilliseconds = d.getTime();
-                        Credit credit = premiumAccountPrx.getCredit(amount, currencyType, startMilliseconds, endMilliseconds);
-                        System.out.println("YOUR CREDIT INFO");
-                        System.out.println("COST: " + credit.domesticCost + " " + credit.domesticCurrency);
-                        System.out.println("COST: " + credit.foreignCost + " " + credit.foreignCurrency);
+                        try {
+                            Credit credit = premiumAccountPrx.getCredit(amount, currencyType, startMilliseconds, endMilliseconds);
+                            System.out.println("YOUR CREDIT INFO");
+                            System.out.println("COST: " + credit.domesticCost + " " + credit.domesticCurrency);
+                            System.out.println("COST: " + credit.foreignCost + " " + credit.foreignCurrency);
+                        }catch (InvalidValueError | DateError e){
+                            System.out.println(e);
+                            break;
+                        }
                     } else if (line.equals("x")) {
                         // Nothing to do
                     }

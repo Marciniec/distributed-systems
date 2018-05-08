@@ -25,4 +25,12 @@ public class AccountI implements Account {
     public void depositMoney(double amount, Current current) {
         balance+=amount;
     }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
 }

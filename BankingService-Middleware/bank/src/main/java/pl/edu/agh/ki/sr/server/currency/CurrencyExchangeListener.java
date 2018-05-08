@@ -12,8 +12,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CurrencyExchangeListener {
+    private static final Logger logger = Logger.getLogger(CurrencyExchangeListener.class.getName());
 
     private final ManagedChannel channel;
     private final ExchangeServiceGrpc.ExchangeServiceBlockingStub exchangeServiceBlockingStub;
@@ -33,11 +36,8 @@ public class CurrencyExchangeListener {
     }
 
     public void startListeningOnCurrencyExchange(CurrencyType[] currencies) throws InterruptedException {
-        System.out.println("Listening on currencies: ");
-        for (CurrencyType c :
-                currencies) {
-            System.out.print(c + " ");
-        }
+        logger.log(Level.INFO, "Listening on currencies: " + Arrays.toString(currencies)) ;
+
 
         Currencies request =
                 Currencies.newBuilder()
@@ -48,11 +48,11 @@ public class CurrencyExchangeListener {
             currencyExchanges = exchangeServiceBlockingStub.getCurrencyRate(request);
             for (int i = 1; currencyExchanges.hasNext(); i++) {
                 CurrencyExchange exchange = currencyExchanges.next();
-                System.out.println(String.format("Received %s in rate of %s", exchange.getType(), exchange.getExchangeRate()));
+                logger.info(String.format("Received %s in rate of %s", exchange.getType(), exchange.getExchangeRate()));
                 rates.put(exchange.getType(), exchange.getExchangeRate());
             }
         } catch (StatusRuntimeException e) {
-            System.out.println(String.format("RPC failed: %s", e.getStatus()));
+            logger.log(Level.SEVERE,String.format("RPC failed: %s", e.getStatus()));
         }
     }
 

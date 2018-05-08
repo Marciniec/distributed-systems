@@ -2,10 +2,13 @@ package pl.edu.agh.ki.sr.server.currency;
 
 import pl.edu.agh.ki.sr.CurrencyType;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Rates {
+    private static final Logger logger = Logger.getLogger(Rates.class.getName());
+
     private final Map<CurrencyType, Double> rates;
 
     public Rates(Map<CurrencyType, Double> rates) {
@@ -13,6 +16,7 @@ public class Rates {
     }
 
     public double calculateWorth(CurrencyType from, CurrencyType to, double value) {
+        logger.log(Level.INFO, "Calculating " + from + "*" + String.valueOf(value) + "/" + to);
         return (rates.get(from) * value) / rates.get(to);
     }
 
