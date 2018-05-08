@@ -5,6 +5,7 @@ import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.LocalException;
 import com.zeroc.Ice.ObjectPrx;
 import com.zeroc.Ice.Util;
+import com.zeroc.Ice.OperationNotExistException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -94,6 +95,7 @@ public class Client {
 
             do {
                 try {
+                    System.out.println("Check balance or deposit money");
                     System.out.print("==> ");
                     System.out.flush();
                     line = in.readLine();
@@ -136,8 +138,11 @@ public class Client {
                             System.out.println("YOUR CREDIT INFO");
                             System.out.println("COST: " + credit.domesticCost + " " + credit.domesticCurrency);
                             System.out.println("COST: " + credit.foreignCost + " " + credit.foreignCurrency);
-                        }catch (InvalidValueError | DateError e){
+                        } catch (InvalidValueError | DateError e) {
                             System.out.println(e);
+                            break;
+                        } catch (OperationNotExistException e) {
+                            System.out.println("YOU CANNOT TAKE CREDIT");
                             break;
                         }
                     } else if (line.equals("x")) {
