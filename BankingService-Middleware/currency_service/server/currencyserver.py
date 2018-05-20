@@ -49,6 +49,7 @@ class CurrencyServer(ExchangeServiceServicer):
 
     def getCurrencyRate(self, request, context):
         handled_currencies = []
+        print(request)
         for currency in request.type:
             handled_currencies.append(currency)
             yield CurrencyServer.rates[currency]
