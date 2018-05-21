@@ -3,7 +3,6 @@ package server;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import client.ClientActor;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 

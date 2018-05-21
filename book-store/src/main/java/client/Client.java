@@ -5,6 +5,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import messages.OrderRequest;
 import messages.SearchRequest;
 
 import java.io.BufferedReader;
@@ -38,6 +39,10 @@ public class Client {
                 if (line.startsWith("search")){
                     SearchRequest searchRequest = new SearchRequest(line.split(" ")[1],clientName);
                     clientActor.tell(searchRequest, null);
+                }
+                if (line.startsWith("order")){
+                    OrderRequest orderRequest = new OrderRequest(line.split(" ")[1],clientName);
+                    clientActor.tell(orderRequest, null);
                 }
 
             }
