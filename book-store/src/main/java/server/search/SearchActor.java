@@ -21,9 +21,9 @@ public class SearchActor extends AbstractActor {
     }
 
 
-    private int findPriceOfTitle(String title, int numberOfDatabase) {
+    private int findPriceOfTitle(String title, int numberOfDatabase) throws IOException{
         File file = new File(String.format("books/database%d/book-index.txt", numberOfDatabase));
-        String line = null;
+        String line;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(title)) {
@@ -31,9 +31,9 @@ public class SearchActor extends AbstractActor {
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw  new FileNotFoundException();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOException();
         }
         return line != null ? Integer.valueOf(line.split(" ")[1]) : -1;
 

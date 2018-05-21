@@ -1,13 +1,16 @@
 package server;
 
-import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.actor.Props;
+import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.pf.DeciderBuilder;
+import messages.GoodbyeRequest;
 import messages.OrderRequest;
 import messages.Request;
+import scala.concurrent.duration.Duration;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,8 +46,21 @@ public class Server extends AbstractActor {
                         System.out.println("Started server");
                     }
                 })
+                .match(GoodbyeRequest.class, goodbyeRequest -> getContext().stop(actors.get(goodbyeRequest.getClient())))
                 .matchAny(o -> log.info("received unknown message"))
-                .build();
-    }
+                        .build();
+                }
 
-}
+        private static SupervisorStrategy strategy
+                = new OneForOneStrategy(10, Duration.create("1 minute"), DeciderBuilder
+                .match(FileNotFoundException.class, e -> SupervisorStrategy.escalate())
+                .match(IOException.class, e -> SupervisorStrategy.restart())
+                .matchAny(o -> SupervisorStrategy.restart())
+                .build());
+
+        @Override
+        public SupervisorStrategy supervisorStrategy () {
+            return strategy;
+        }
+
+    }

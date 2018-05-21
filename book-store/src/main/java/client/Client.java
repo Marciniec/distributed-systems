@@ -24,7 +24,7 @@ public class Client {
         Config config = ConfigFactory.parseFile(configFile);
 
         // create actor system & actors
-        final ActorSystem system = ActorSystem.create("client_system", config);
+        final ActorSystem system = ActorSystem.create("client_system",config);
 
         // interaction
         try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {

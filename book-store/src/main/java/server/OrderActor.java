@@ -24,13 +24,13 @@ public class OrderActor extends AbstractActor {
                 .build();
     }
 
-    private void saveToFile(String title) {
+    private void saveToFile(String title) throws IOException {
         try (FileWriter fw = new FileWriter("order.txt", true);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
-                out.println(title);
+            out.println(title);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOException();
         }
     }
 }

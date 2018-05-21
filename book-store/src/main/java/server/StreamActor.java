@@ -28,12 +28,13 @@ public class StreamActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(StreamRequest.class, streamRequest -> {
-                    try (Stream<String> stream = Files.lines(Paths.get("books/database1/book1.txt"))) {
+                    System.out.println("XD");
+                    try (Stream<String> stream = Files.lines(Paths.get(String.format("books/database1/%s.txt", streamRequest.getTitle())))) {
                         final Materializer materializer = ActorMaterializer.create(getContext().getSystem());
                         Source<String, NotUsed> source = Source.from(stream.collect(Collectors.toList()));
                         source.map(String::toString)
                                 .throttle(1, Duration.ofSeconds(1))
-                                .runWith(Sink.actorRef(getSender(),  "OK"), materializer);
+                                .runWith(Sink.actorRef(getSender(), "OK"), materializer);
 
                     } catch (IOException e) {
                         e.printStackTrace();

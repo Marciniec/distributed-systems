@@ -6,7 +6,7 @@ public class StreamRequest implements Request, Serializable{
     private String client;
     private String title;
 
-    public StreamRequest(String client, String title) {
+    public StreamRequest( String title, String client) {
         this.client = client;
         this.title = title;
     }
