@@ -19,7 +19,7 @@ public class ServerActor extends AbstractActor {
     private ActorRef searchActor1;
     private ActorRef searchActor2;
     private ActorRef streamActor = getContext().actorOf(Props.create(StreamActor.class), "stream");
-
+    private String gotTitle = null;
     @Override
     public Receive createReceive() {
         return receiveBuilder()
@@ -31,16 +31,21 @@ public class ServerActor extends AbstractActor {
                 })
                 .match(StreamRequest.class, streamRequest -> streamActor.tell(streamRequest, getSender()))
                 .match(SearchResponse.class, searchResponse -> {
-                    getContext().stop(searchActor1);
-                    getContext().stop(searchActor2);
-                    getSender().tell(searchResponse, getSelf());
+                    if(gotTitle ==null){
+                        gotTitle = searchResponse.getTitle();
+                        getContext().stop(searchActor1);
+                        getContext().stop(searchActor2);
+                        getSender().tell( searchResponse, getSelf());
+                    }else {
+                        gotTitle = null;
+                    }
                 })
                 .matchAny(o -> log.info("received unknown message"))
                 .build();
     }
 
     private static SupervisorStrategy strategy
-            = new AllForOneStrategy(10, Duration.create("1 minute"), DeciderBuilder
+            = new OneForOneStrategy(10, Duration.create("1 minute"), DeciderBuilder
             .match(FileNotFoundException.class, e -> SupervisorStrategy.escalate())
             .match(IOException.class, e -> SupervisorStrategy.restart())
             .matchAny(o -> SupervisorStrategy.restart())

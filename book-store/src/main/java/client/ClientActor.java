@@ -19,7 +19,10 @@ public class ClientActor extends AbstractActor {
                     getContext().actorSelection("akka.tcp://server_system@127.0.0.1:2553/user/server").tell(s, getSelf());
                 })
                 .match(SearchResponse.class, searchResponse -> {
-                    System.out.println(String.format("Cost is: %s", searchResponse.getPrice()));
+                    if(searchResponse.getPrice()==-1) System.out.println("No such book");
+                    else{
+                        System.out.println(String.format("Cost is: %s", searchResponse.getPrice()));
+                    }
                 })
                 .match(String.class, System.out::println)
                 .matchAny(o -> log.info("received unknown message"))
