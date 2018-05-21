@@ -15,6 +15,7 @@ public class ServerActor extends AbstractActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private ActorRef searchActor1;
     private ActorRef searchActor2;
+    private ActorRef streamActor = getContext().actorOf(Props.create(StreamActor.class), "stream");
 
     @Override
     public Receive createReceive() {
@@ -26,8 +27,7 @@ public class ServerActor extends AbstractActor {
                     searchActor2.tell(new SearchQuery(searchRequest.getTitle(), 2), getSender());
                 })
                 .match(StreamRequest.class, streamRequest -> {
-                })
-                .match(OrderRequest.class, orderRequest -> {
+                    streamActor.tell(streamRequest, getSender());
                 })
                 .match(SearchResponse.class, searchResponse -> {
                     getContext().stop(searchActor1);

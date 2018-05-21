@@ -7,6 +7,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import messages.OrderRequest;
 import messages.SearchRequest;
+import messages.StreamRequest;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +44,10 @@ public class Client {
                 if (line.startsWith("order")){
                     OrderRequest orderRequest = new OrderRequest(line.split(" ")[1],clientName);
                     clientActor.tell(orderRequest, null);
+                }
+                if (line.startsWith("stream")){
+                    StreamRequest streamRequest = new StreamRequest(line.split(" ")[1],clientName);
+                    clientActor.tell(streamRequest, null);
                 }
 
             }
