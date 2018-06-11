@@ -9,7 +9,7 @@ import org.apache.zookeeper.ZooKeeper;
 
 public class Executor
         implements Watcher, Runnable, DataMonitor.DataMonitorListener {
-    private final String znode = "";
+    private final String znode = "/znode_testowy";
 
     private DataMonitor dm;
 

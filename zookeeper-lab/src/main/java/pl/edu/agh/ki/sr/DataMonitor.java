@@ -1,6 +1,7 @@
 package pl.edu.agh.ki.sr;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
@@ -22,6 +23,8 @@ public class DataMonitor implements Watcher, StatCallback {
 
     private DataMonitorListener listener;
 
+    private int descendants;
+
     byte prevData[];
 
     public DataMonitor(ZooKeeper zk, String znode, Watcher chainedWatcher,
@@ -33,6 +36,7 @@ public class DataMonitor implements Watcher, StatCallback {
         // Get things started by checking if the node exists. We are going
         // to be completely event driven
         zk.exists(znode, true, this, null);
+        descendants = getDescendantsNumber(znode);
     }
 
     /**
@@ -47,8 +51,7 @@ public class DataMonitor implements Watcher, StatCallback {
         /**
          * The ZooKeeper session is no longer valid.
          *
-         * @param rc
-         *                the ZooKeeper reason code
+         * @param rc the ZooKeeper reason code
          */
         void closing(int rc);
     }
@@ -71,6 +74,12 @@ public class DataMonitor implements Watcher, StatCallback {
                     listener.closing(KeeperException.Code.SessionExpired);
                     break;
             }
+        } else if (event.getType() == Event.EventType.NodeChildrenChanged) {
+            int tmp = getDescendantsNumber(znode);
+            if (descendants < tmp) {
+                System.out.println("Descendants number: " + tmp);
+            }
+            descendants = tmp;
         } else {
             if (path != null && path.equals(znode)) {
                 // Something has changed on the node, let's find out
@@ -80,6 +89,16 @@ public class DataMonitor implements Watcher, StatCallback {
         if (chainedWatcher != null) {
             chainedWatcher.process(event);
         }
+    }
+
+    private int getDescendantsNumber(String path) {
+        try {
+            List<String> children = zk.getChildren(path, this);
+            return children.size() + children.stream().mapToInt(child -> getDescendantsNumber(path + "/" + child)).sum();
+        } catch (KeeperException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public void processResult(int rc, String path, Object ctx, Stat stat) {
