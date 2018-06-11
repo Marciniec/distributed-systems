@@ -93,8 +93,11 @@ public class DataMonitor implements Watcher, StatCallback {
 
     private int getDescendantsNumber(String path) {
         try {
-            List<String> children = zk.getChildren(path, this);
-            return children.size() + children.stream().mapToInt(child -> getDescendantsNumber(path + "/" + child)).sum();
+            Stat stat = zk.exists(path, this);
+            if (stat != null) {
+                List<String> children = zk.getChildren(path, this);
+                return children.size() + children.stream().mapToInt(child -> getDescendantsNumber(path + "/" + child)).sum();
+            }
         } catch (KeeperException | InterruptedException e) {
             e.printStackTrace();
         }

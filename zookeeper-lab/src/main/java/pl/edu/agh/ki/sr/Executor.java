@@ -1,6 +1,7 @@
 package pl.edu.agh.ki.sr;
 
 import java.io.*;
+import java.util.List;
 
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
@@ -9,47 +10,33 @@ import org.apache.zookeeper.ZooKeeper;
 
 public class Executor
         implements Watcher, Runnable, DataMonitor.DataMonitorListener {
-    private final String znode = "/znode_testowy";
-
+    private String znode;
     private DataMonitor dm;
 
     private ZooKeeper zk;
 
-    private String filename;
-
-    private String exec;
+    private String exec[];
 
     private Process child;
 
-    public Executor(String hostPort, String filename,
-                    String exec) throws KeeperException, IOException {
-        this.filename = filename;
+    public Executor(String hostPort, String znode,
+                    String exec[]) throws KeeperException, IOException {
         this.exec = exec;
+        this.znode = znode;
         zk = new ZooKeeper(hostPort, 3000, this);
         dm = new DataMonitor(zk, znode, null, this);
     }
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        String hostPort =null;
-        String filename = null;
-        String exec = null;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
-            System.out.println("Input host port");
-            hostPort = br.readLine();
-            System.out.println("input file name");
-            filename = br.readLine();
-            System.out.println("input exec");
-            exec = br.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+    public void printDescendantsTree(String path) {
 
         try {
-            new Executor(hostPort, filename, exec).run();
-        } catch (Exception e) {
+            if (zk.exists(path, this) != null) {
+                System.out.println(path);
+                List<String> children = zk.getChildren(path, this);
+                children.forEach(child -> printDescendantsTree(path + "/" + child));
+            }
+        } catch (KeeperException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -124,13 +111,6 @@ public class Executor
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-            try {
-                FileOutputStream fos = new FileOutputStream(filename);
-                fos.write(data);
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
             try {
                 System.out.println("Starting child");
